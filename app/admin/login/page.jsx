@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function AdminLoginPage() {
+function AdminLoginInner() {
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,27 +37,27 @@ export default function AdminLoginPage() {
     <main className="auth-shell">
       <div className="card auth-card">
         <div className="kicker">Admin</div>
-        <h1 style={{fontSize:44, margin:"10px 0 12px"}}>{mode === "login" ? "Sign in" : "Create account"}</h1>
-        <p className="muted" style={{marginBottom:18}}>
+        <h1 style={{ fontSize: 44, margin: "10px 0 12px" }}>{mode === "login" ? "Sign in" : "Create account"}</h1>
+        <p className="muted" style={{ marginBottom: 18 }}>
           {mode === "login"
             ? "Use your admin email and password."
             : "Create a user, then add it to admin_users in Supabase to grant dashboard access."}
         </p>
 
         {error === "not-admin" ? (
-          <div className="notice" style={{marginBottom:14}}>
+          <div className="notice" style={{ marginBottom: 14 }}>
             You signed in successfully, but this account is not listed in <code>admin_users</code> yet.
           </div>
         ) : null}
 
-        {msg ? <div className="notice" style={{marginBottom:14}}>{msg}</div> : null}
+        {msg ? <div className="notice" style={{ marginBottom: 14 }}>{msg}</div> : null}
 
         <form onSubmit={handleSubmit}>
-          <div style={{marginBottom:14}}>
+          <div style={{ marginBottom: 14 }}>
             <label className="label">Email</label>
             <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
-          <div style={{marginBottom:14}}>
+          <div style={{ marginBottom: 14 }}>
             <label className="label">Password</label>
             <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
@@ -68,12 +68,34 @@ export default function AdminLoginPage() {
 
         <button
           className="btn"
-          style={{marginTop:12}}
-          onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMsg(""); }}
+          style={{ marginTop: 12 }}
+          onClick={() => {
+            setMode(mode === "login" ? "signup" : "login");
+            setMsg("");
+          }}
         >
           {mode === "login" ? "Need a new account?" : "Already have an account?"}
         </button>
       </div>
     </main>
+  );
+}
+
+function AuthFallback() {
+  return (
+    <main className="auth-shell">
+      <div className="card auth-card">
+        <div className="kicker">Admin</div>
+        <h1 style={{ fontSize: 44, margin: "10px 0 12px" }}>Loading…</h1>
+      </div>
+    </main>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<AuthFallback />}>
+      <AdminLoginInner />
+    </Suspense>
   );
 }
