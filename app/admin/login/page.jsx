@@ -2,18 +2,16 @@
 
 import { Suspense, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 function AdminLoginInner() {
   const supabase = createClient();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState("login");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
-  const error = searchParams.get("error");
 
   async function handleSubmit(e) {
     e.preventDefault();
